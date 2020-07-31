@@ -145,7 +145,7 @@ class _TodayState extends State<Today> {
         ),
         body: Column(
           children: <Widget>[
-            if(connectivityResult != ConnectivityResult.wifi)
+            if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
               Row(
                 children: <Widget>[
                   Expanded(
