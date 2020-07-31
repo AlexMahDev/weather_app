@@ -6,43 +6,11 @@ import 'dart:convert';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:share/share.dart';
+import 'package:weatherapp/services/values.dart';
 
 const apiKey = 'd740d8231f601a1cff9e667cb2205b82';
 
-String windDirection(var value) {
-  if (value >= 11.25 && value < 33.75)
-    return "NNE";
-  else if (value >= 33.75 && value < 56.25)
-    return "NE";
-  else if (value >= 56.25 && value < 78.75)
-    return "ENE";
-  else if (value >= 78.25 && value < 101.25)
-    return "E";
-  else if (value >= 101.25 && value < 123.75)
-    return "ESE";
-  else if (value >= 123.75 && value < 146.25)
-    return "SE";
-  else if (value >= 146.25 && value < 168.75)
-    return "SSE";
-  else if (value >= 168.75 && value < 191.25)
-    return "S";
-  else if (value >= 191.25 && value < 213.75)
-    return "SSW";
-  else if (value >= 213.75 && value < 236.25)
-    return "SW";
-  else if (value >= 236.25 && value < 258.75)
-    return "WSW";
-  else if (value >= 258.75 && value < 281.25)
-    return "W";
-  else if (value >= 281.25 && value < 303.75)
-    return "WNW";
-  else if (value >= 303.75 && value < 326.25)
-    return "NW";
-  else if (value >= 326.25 && value < 348.75)
-    return "NNW";
-  else if ((value >= 348.75 && value <= 360) || (value >= 0 && value < 11.25))
-    return "N";
-}
+ParsedValues parsedvalue = ParsedValues();
 
 String cityName;
 String countryName;
@@ -55,23 +23,12 @@ var windSpeed;
 var cloudiness;
 var windDir;
 
-var time;
-
 Map data;
 List weatherList;
 
-int weekDay;
-int newWeekDay;
-var newTime;
-
-
 var connectivityResult;
 
-List <Container> weatherInfo = [];
-
-
 void main() => runApp(MyApp());
-
 
 class MyApp extends StatelessWidget {
   @override
@@ -125,13 +82,10 @@ class Today extends StatefulWidget {
   _TodayState createState() => _TodayState();
 }
 
-
 class _TodayState extends State<Today> {
-
 
   double latitude;
   double long;
-
 
   @override
   void initState() {
@@ -149,8 +103,6 @@ class _TodayState extends State<Today> {
 
     getData();
 
-    print(latitude);
-    print(long);
   }
 
 
@@ -163,7 +115,6 @@ class _TodayState extends State<Today> {
     if(response.statusCode == 200) {
       data = jsonDecode(response.body);
 
-
       image = data["list"][0]["weather"][0]["icon"];
       cityName = data["city"]["name"];
       countryName = data["city"]["country"];
@@ -173,9 +124,7 @@ class _TodayState extends State<Today> {
       cloudiness = data["list"][0]["clouds"]["all"];
       pressureNumber = data["list"][0]["main"]["pressure"];
       windSpeed = (3.6 * data["list"][0]["wind"]["speed"]).toInt();
-      windDir = windDirection(data["list"][0]["wind"]["deg"]);
-
-
+      windDir = parsedvalue.windDirection(data["list"][0]["wind"]["deg"]);
 
       if (mounted) {
         setState(() {
@@ -183,21 +132,12 @@ class _TodayState extends State<Today> {
         });
       }
 
-      debugPrint(weatherList.toString());
-
-
     } else print(response.statusCode);
-
-    print(connectivityResult);
-
-    print(weatherList[0]["wind"]["deg"]);
 
   }
 
   @override
   Widget build(BuildContext context) {
-
-
     return Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -245,20 +185,23 @@ class _TodayState extends State<Today> {
                           children: <Widget>[
                             Column(
                               children: <Widget>[
-                                Image.network('http://openweathermap.org/img/wn/10d@2x.png', height: 50, width: 50),
-                                Text("$humidityNumber%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15))
+                                Image(image: AssetImage('images/water.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("$humidityNumber%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
                               ],
                             ),
                             Column(
                               children: <Widget>[
-                                Image.network('http://openweathermap.org/img/wn/10d@2x.png', height: 50, width: 50),
-                                Text("$cloudiness%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15))
+                                Image(image: AssetImage('images/cloud.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("$cloudiness%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
                               ],
                             ),
                             Column(
                               children: <Widget>[
-                                Image.network('http://openweathermap.org/img/wn/10d@2x.png', height: 50, width: 50,),
-                                Text("$pressureNumber hPa", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15))
+                                Image(image: AssetImage('images/meter.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("$pressureNumber hPa", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
                               ],
                             ),
                           ],
@@ -269,14 +212,16 @@ class _TodayState extends State<Today> {
                           children: <Widget>[
                             Column(
                               children: <Widget>[
-                                Image.network('http://openweathermap.org/img/wn/10d@2x.png', height: 50, width: 50,),
-                                Text("$windSpeed km/h", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15))
+                                Image(image: AssetImage('images/wind.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("$windSpeed km/h", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
                               ],
                             ),
                             Column(
                               children: <Widget>[
-                                Image.network('http://openweathermap.org/img/wn/10d@2x.png', height: 50, width: 50,),
-                                Text("$windDir", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15))
+                                Image(image: AssetImage('images/compass.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("$windDir", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
                               ],
                             ),
                           ],
@@ -308,24 +253,6 @@ class Forecast extends StatefulWidget {
 }
 
 class _ForecastState extends State<Forecast> {
-
-  String getDay(int value) {
-    if (value == 1)
-      return "Monday";
-    else if (value == 2)
-      return "Tuesday";
-    else if (value == 3)
-      return "Wednesday";
-    else if (value == 4)
-      return "Thursday";
-    else if (value == 5)
-      return "Friday";
-    else if (value == 6)
-      return "Saturday";
-    else if (value == 7)
-      return "Sunday";
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -338,6 +265,15 @@ class _ForecastState extends State<Forecast> {
             itemBuilder: (context, index) {
               return Column (
                 children: <Widget>[
+                  if(index == 0)
+                    Row(
+                      children: <Widget>[
+                        Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Text("Today", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
+                        ),
+                      ],
+                    ),
                   ListTile(
                     leading: Image.network('http://openweathermap.org/img/wn/${weatherList[index]["weather"][0]["icon"]}@2x.png', width: 80, height: 80, fit: BoxFit.cover,),
                     title: Text("${weatherList[index]["dt_txt"].toString().substring(11, 16)}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
@@ -345,10 +281,13 @@ class _ForecastState extends State<Forecast> {
                     trailing: Text("${weatherList[index]["main"]["temp"].toInt()}°", style: TextStyle(fontSize: 40, color: Colors.blue)),
                   ),
                   if(index != 39)
-                    if(getDay(DateTime.parse(weatherList[index]["dt_txt"]).weekday) != getDay(DateTime.parse(weatherList[index+1]["dt_txt"]).weekday) && index + 1 != 40)
+                    if(parsedvalue.getDay(DateTime.parse(weatherList[index]["dt_txt"]).weekday) != parsedvalue.getDay(DateTime.parse(weatherList[index+1]["dt_txt"]).weekday) && index + 1 != 40)
                       Row(
                         children: <Widget>[
-                          Text("${getDay(DateTime.parse(weatherList[index]["dt_txt"]).weekday)}", style: TextStyle(fontSize: 30),),
+                          Padding(
+                            padding: const EdgeInsets.all(10),
+                            child: Text("${parsedvalue.getDay(1 + DateTime.parse(weatherList[index]["dt_txt"]).weekday)}", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
+                          ),
                         ],
                       ),
                 ],

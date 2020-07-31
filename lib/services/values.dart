@@ -35,7 +35,7 @@ class ParsedValues {
   }
 
   String getDay(int value) {
-    if (value == 1)
+    if (value == 8)
       return "Monday";
     else if (value == 2)
       return "Tuesday";
