@@ -33,6 +33,7 @@ dependencies:
   flutter_statusbarcolor: ^0.2.3
   connectivity: ^0.4.9
   share: ^0.6.4+3
+  splashscreen: ^1.2.0
 
 
 dev_dependencies:

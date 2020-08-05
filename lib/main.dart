@@ -7,6 +7,7 @@ import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:share/share.dart';
 import 'package:weatherapp/services/values.dart';
+import 'package:splashscreen/splashscreen.dart';
 
 const apiKey = 'd740d8231f601a1cff9e667cb2205b82';
 
@@ -36,10 +37,95 @@ class MyApp extends StatelessWidget {
     FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
     return MaterialApp(
       theme: ThemeData(brightness: Brightness.light),
-      home: HomePage(),
+      home: Splash(),
     );
   }
 }
+
+class Splash extends StatefulWidget {
+  @override
+  _SplashState createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
+
+  double latitude;
+  double long;
+
+@override
+  void initState() {
+    super.initState();
+    connection();
+    getLocation();
+  }
+
+  void connection() async {
+    connectivityResult = await (Connectivity().checkConnectivity());
+  }
+
+void getLocation() async {
+  try {
+    Position position = await Geolocator().getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    latitude = position.latitude;
+    long = position.longitude;
+  } catch (exception) {print(exception);}
+
+  getData();
+
+}
+
+
+void getData() async {
+
+  //connectivityResult = await (Connectivity().checkConnectivity());
+
+  http.Response response = await http.get('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$long&appid=$apiKey&units=metric');
+
+  if(response.statusCode == 200) {
+    data = jsonDecode(response.body);
+
+    image = data["list"][0]["weather"][0]["icon"];
+    cityName = data["city"]["name"];
+    countryName = data["city"]["country"];
+    temperature = data["list"][0]["main"]["temp"].toInt();
+    description = data["list"][0]["weather"][0]["main"];
+    humidityNumber = data["list"][0]["main"]["humidity"];
+    cloudiness = data["list"][0]["clouds"]["all"];
+    pressureNumber = data["list"][0]["main"]["pressure"];
+    windSpeed = (3.6 * data["list"][0]["wind"]["speed"]).toInt();
+    windDir = parsedvalue.windDirection(data["list"][0]["wind"]["deg"]);
+
+    if (mounted) {
+      setState(() {
+        weatherList = data["list"];
+      });
+    }
+
+  } else print(response.statusCode);
+
+}
+
+  @override
+  Widget build(BuildContext context) {
+    return new SplashScreen(
+        seconds: 3,
+        navigateAfterSeconds: new HomePage(),
+        title: new Text('Weather Application',
+          style: new TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 20.0
+          ),),
+        image: Image.asset('images/splash.png'),
+        backgroundColor: Colors.lightBlueAccent,
+        styleTextUnderTheLoader: new TextStyle(),
+        photoSize: 100.0,
+        onClick: ()=>print("Flutter Egypt"),
+        loaderColor: Colors.red
+    );
+  }
+}
+
 
 class HomePage extends StatefulWidget {
   @override
@@ -83,58 +169,6 @@ class Today extends StatefulWidget {
 }
 
 class _TodayState extends State<Today> {
-
-  double latitude;
-  double long;
-
-  @override
-  void initState() {
-    super.initState();
-    getLocation();
-  }
-
-  void getLocation() async {
-    try {
-      Position position = await Geolocator().getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.high);
-      latitude = position.latitude;
-      long = position.longitude;
-    } catch (exception) {print(exception);}
-
-    getData();
-
-  }
-
-
-  void getData() async {
-
-    connectivityResult = await (Connectivity().checkConnectivity());
-
-    http.Response response = await http.get('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$long&appid=$apiKey&units=metric');
-
-    if(response.statusCode == 200) {
-      data = jsonDecode(response.body);
-
-      image = data["list"][0]["weather"][0]["icon"];
-      cityName = data["city"]["name"];
-      countryName = data["city"]["country"];
-      temperature = data["list"][0]["main"]["temp"].toInt();
-      description = data["list"][0]["weather"][0]["main"];
-      humidityNumber = data["list"][0]["main"]["humidity"];
-      cloudiness = data["list"][0]["clouds"]["all"];
-      pressureNumber = data["list"][0]["main"]["pressure"];
-      windSpeed = (3.6 * data["list"][0]["wind"]["speed"]).toInt();
-      windDir = parsedvalue.windDirection(data["list"][0]["wind"]["deg"]);
-
-      if (mounted) {
-        setState(() {
-          weatherList = data["list"];
-        });
-      }
-
-    } else print(response.statusCode);
-
-  }
 
   @override
   Widget build(BuildContext context) {
