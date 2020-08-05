@@ -8,10 +8,13 @@ import 'package:connectivity/connectivity.dart';
 import 'package:share/share.dart';
 import 'package:weatherapp/services/values.dart';
 import 'package:splashscreen/splashscreen.dart';
+import 'package:app_settings/app_settings.dart';
 
 const apiKey = 'd740d8231f601a1cff9e667cb2205b82';
 
 ParsedValues parsedvalue = ParsedValues();
+
+bool locationFailed;
 
 String cityName;
 String countryName;
@@ -37,7 +40,11 @@ class MyApp extends StatelessWidget {
     FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
     return MaterialApp(
       theme: ThemeData(brightness: Brightness.light),
-      home: Splash(),
+        initialRoute: '/',
+        routes: {
+          '/': (context) => Splash(),
+        }
+      //home: Splash(),
     );
   }
 }
@@ -69,7 +76,7 @@ void getLocation() async {
         desiredAccuracy: LocationAccuracy.high);
     latitude = position.latitude;
     long = position.longitude;
-  } catch (exception) {print(exception);}
+  } catch (exception) {print(exception); locationFailed = true;}
 
   getData();
 
@@ -109,7 +116,7 @@ void getData() async {
   @override
   Widget build(BuildContext context) {
     return new SplashScreen(
-        seconds: 3,
+        seconds: 5,
         navigateAfterSeconds: new HomePage(),
         title: new Text('Weather Application',
           style: new TextStyle(
@@ -179,7 +186,29 @@ class _TodayState extends State<Today> {
         ),
         body: Column(
           children: <Widget>[
-            if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
+            if (locationFailed == true)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text("Location failed"),
+                      RaisedButton(
+                        onPressed: () => AppSettings.openLocationSettings(),
+                        child: Text("Settings"),
+                      ),
+                      RaisedButton(
+                        child: Text("Update"),
+                        onPressed: () {
+                          locationFailed = false;
+                          Navigator.pushNamed(context, '/');
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
               Row(
                 children: <Widget>[
                   Expanded(
@@ -294,39 +323,78 @@ class _ForecastState extends State<Forecast> {
           backgroundColor: Colors.white,
           title: Text("$cityName", style: TextStyle(color: Colors.black)),
         ),
-        body: ListView.builder(
-            itemCount: weatherList == null ? 0 : weatherList.length,
-            itemBuilder: (context, index) {
-              return Column (
-                children: <Widget>[
-                  if(index == 0)
-                    Row(
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Text("Today", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
-                        ),
-                      ],
-                    ),
-                  ListTile(
-                    leading: Image.network('http://openweathermap.org/img/wn/${weatherList[index]["weather"][0]["icon"]}@2x.png', width: 80, height: 80, fit: BoxFit.cover,),
-                    title: Text("${weatherList[index]["dt_txt"].toString().substring(11, 16)}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                    subtitle: Text("${weatherList[index]["weather"][0]["description"]}", style: TextStyle(color: Colors.black)),
-                    trailing: Text("${weatherList[index]["main"]["temp"].toInt()}°", style: TextStyle(fontSize: 40, color: Colors.blue)),
-                  ),
-                  if(index != 39)
-                    if(parsedvalue.getDay(DateTime.parse(weatherList[index]["dt_txt"]).weekday) != parsedvalue.getDay(DateTime.parse(weatherList[index+1]["dt_txt"]).weekday) && index + 1 != 40)
-                      Row(
-                        children: <Widget>[
-                          Padding(
-                            padding: const EdgeInsets.all(10),
-                            child: Text("${parsedvalue.getDay(1 + DateTime.parse(weatherList[index]["dt_txt"]).weekday)}", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
-                          ),
-                        ],
+        body: Column(
+          children: <Widget>[
+            if (locationFailed == true)
+              Expanded(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      Text("Location failed"),
+                      RaisedButton(
+                        onPressed: () => AppSettings.openLocationSettings(),
+                        child: Text("Settings"),
                       ),
+                    ],
+                  ),
+                ),
+              )
+            else if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: Container(
+                      decoration: BoxDecoration(
+                          color: Colors.black12
+                      ),
+                      child: Center(
+                        child: Text(
+                          "OFFLINE",
+                          style: TextStyle(fontSize: 15),
+                        ),
+                      ),
+                    ),
+                  )
                 ],
-              );
-            }
+              ) else
+            Expanded(
+              child: ListView.builder(
+                  itemCount: weatherList == null ? 0 : weatherList.length,
+                  itemBuilder: (context, index) {
+                    return Column (
+                      children: <Widget>[
+                        if(index == 0)
+                          Row(
+                            children: <Widget>[
+                              Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Text("Today", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
+                              ),
+                            ],
+                          ),
+                        ListTile(
+                          leading: Image.network('http://openweathermap.org/img/wn/${weatherList[index]["weather"][0]["icon"]}@2x.png', width: 80, height: 80, fit: BoxFit.cover,),
+                          title: Text("${weatherList[index]["dt_txt"].toString().substring(11, 16)}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                          subtitle: Text("${weatherList[index]["weather"][0]["description"]}", style: TextStyle(color: Colors.black)),
+                          trailing: Text("${weatherList[index]["main"]["temp"].toInt()}°", style: TextStyle(fontSize: 40, color: Colors.blue)),
+                        ),
+                        if(index != 39)
+                          if(parsedvalue.getDay(DateTime.parse(weatherList[index]["dt_txt"]).weekday) != parsedvalue.getDay(DateTime.parse(weatherList[index+1]["dt_txt"]).weekday) && index + 1 != 40)
+                            Row(
+                              children: <Widget>[
+                                Padding(
+                                  padding: const EdgeInsets.all(10),
+                                  child: Text("${parsedvalue.getDay(1 + DateTime.parse(weatherList[index]["dt_txt"]).weekday)}", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
+                                ),
+                              ],
+                            ),
+                      ],
+                    );
+                  }
+              ),
+            ),
+          ],
         )
     );
   }
