@@ -9,10 +9,12 @@ import 'package:share/share.dart';
 import 'package:weatherapp/services/values.dart';
 import 'package:splashscreen/splashscreen.dart';
 import 'package:app_settings/app_settings.dart';
+import 'package:weatherapp/services/weatherModel.dart';
 
 const apiKey = 'd740d8231f601a1cff9e667cb2205b82';
 
 ParsedValues parsedvalue = ParsedValues();
+WeatherModel weatherCondition = WeatherModel();
 
 bool locationFailed;
 
@@ -44,7 +46,6 @@ class MyApp extends StatelessWidget {
         routes: {
           '/': (context) => Splash(),
         }
-      //home: Splash(),
     );
   }
 }
@@ -85,8 +86,6 @@ void getLocation() async {
 
 
 void getData() async {
-
-  //connectivityResult = await (Connectivity().checkConnectivity());
 
   http.Response response = await http.get('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$long&appid=$apiKey&units=metric');
 
@@ -292,8 +291,7 @@ class _TodayState extends State<Today> {
                     Center(
                       child: Column(
                         children: <Widget>[
-                          if (image != null)
-                            Image.network('http://openweathermap.org/img/wn/$image@2x.png', height: 150, width: 150, fit: BoxFit.cover),
+                          Image.asset('images/conditions/${weatherCondition.weatherModel(weatherList[0]["dt_txt"].toString().substring(11, 16), weatherList[0]["weather"][0]["main"], weatherList[0]["weather"][0]["description"])}', height: 150, width: 150, fit: BoxFit.cover),
                           Text("$cityName, $countryName", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black54)),
                           SizedBox(height: 10,),
                           Text("$temperature°C | $description", style: TextStyle(fontSize: 30, color: Colors.lightBlueAccent),)
@@ -494,7 +492,7 @@ class _ForecastState extends State<Forecast> {
                             ],
                           ),
                         ListTile(
-                          leading: Image.network('http://openweathermap.org/img/wn/${weatherList[index]["weather"][0]["icon"]}@2x.png', width: 80, height: 80, fit: BoxFit.cover,),
+                          leading: Image.asset('images/conditions/${weatherCondition.weatherModel(weatherList[index]["dt_txt"].toString().substring(11, 16), weatherList[index]["weather"][0]["main"], weatherList[index]["weather"][0]["description"])}', width: 80, height: 80, fit: BoxFit.cover),
                           title: Text("${weatherList[index]["dt_txt"].toString().substring(11, 16)}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
                           subtitle: Text("${weatherList[index]["weather"][0]["description"]}", style: TextStyle(color: Colors.black)),
                           trailing: Text("${weatherList[index]["main"]["temp"].toInt()}°", style: TextStyle(fontSize: 40, color: Colors.blue)),
