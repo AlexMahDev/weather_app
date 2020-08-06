@@ -64,6 +64,7 @@ class _SplashState extends State<Splash> {
     super.initState();
     connection();
     getLocation();
+    cityNameChange();
   }
 
   void connection() async {
@@ -73,7 +74,7 @@ class _SplashState extends State<Splash> {
 void getLocation() async {
   try {
     Position position = await Geolocator().getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.high);
+        desiredAccuracy: LocationAccuracy.low);
     latitude = position.latitude;
     long = position.longitude;
   } catch (exception) {print(exception); locationFailed = true;}
@@ -109,25 +110,30 @@ void getData() async {
       });
     }
 
+    cityNameChange();
+
   } else print(response.statusCode);
 
 }
 
+  void cityNameChange() async {
+    if((connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile) || locationFailed == true)
+      cityName = "Unknown";
+  }
+
   @override
   Widget build(BuildContext context) {
-    return new SplashScreen(
-        seconds: 5,
-        navigateAfterSeconds: new HomePage(),
-        title: new Text('Weather Application',
-          style: new TextStyle(
+    return SplashScreen(
+        seconds: 6,
+        navigateAfterSeconds: HomePage(),
+        title: Text('Weather Application',
+          style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 20.0
           ),),
         image: Image.asset('images/splash.png'),
         backgroundColor: Colors.lightBlueAccent,
-        styleTextUnderTheLoader: new TextStyle(),
         photoSize: 100.0,
-        onClick: ()=>print("Flutter Egypt"),
         loaderColor: Colors.red
     );
   }
@@ -186,47 +192,100 @@ class _TodayState extends State<Today> {
         ),
         body: Column(
           children: <Widget>[
-            if (locationFailed == true)
+            if ((locationFailed == true || temperature == null) && (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile))
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text("Location failed"),
-                      RaisedButton(
-                        onPressed: () => AppSettings.openLocationSettings(),
-                        child: Text("Settings"),
-                      ),
-                      RaisedButton(
-                        child: Text("Update"),
-                        onPressed: () {
-                          locationFailed = false;
-                          Navigator.pushNamed(context, '/');
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.black12
-                      ),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.black12
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Location failed",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Expanded(
+                      child: Icon(Icons.gps_off, size: 100,),
+                    ),
+                    Expanded(
                       child: Center(
-                        child: Text(
-                          "OFFLINE",
-                          style: TextStyle(fontSize: 15),
+                        child: Column(
+                          //mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            RaisedButton(
+                              onPressed: () => AppSettings.openLocationSettings(),
+                              child: Text("Settings"),
+                            ),
+                            RaisedButton(
+                              child: Text("Update"),
+                              onPressed: () {
+                                locationFailed = false;
+                                Navigator.pushNamed(context, '/');
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  )
-                ],
-              ) else
+                  ],
+                ),
+              )
+            else if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
               Expanded(
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.black12
+                            ),
+                            child: Center(
+                              child: Text(
+                                "OFFLINE",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Expanded(
+                      child: Icon(Icons.wifi, size: 100,),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          //mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            //Text("Location failed"),
+                            RaisedButton(
+                              onPressed: () => AppSettings.openWIFISettings(),
+                              child: Text("Settings"),
+                            ),
+                            RaisedButton(
+                              child: Text("Update"),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/');
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ) else Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -325,38 +384,99 @@ class _ForecastState extends State<Forecast> {
         ),
         body: Column(
           children: <Widget>[
-            if (locationFailed == true)
+            if ((locationFailed == true || temperature == null) && (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile))
               Expanded(
-                child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: <Widget>[
-                      Text("Location failed"),
-                      RaisedButton(
-                        onPressed: () => AppSettings.openLocationSettings(),
-                        child: Text("Settings"),
-                      ),
-                    ],
-                  ),
-                ),
-              )
-            else if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                          color: Colors.black12
-                      ),
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.black12
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Location failed",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Expanded(
+                      child: Icon(Icons.gps_off, size: 100,),
+                    ),
+                    Expanded(
                       child: Center(
-                        child: Text(
-                          "OFFLINE",
-                          style: TextStyle(fontSize: 15),
+                        child: Column(
+                          //mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            RaisedButton(
+                              onPressed: () => AppSettings.openLocationSettings(),
+                              child: Text("Settings"),
+                            ),
+                            RaisedButton(
+                              child: Text("Update"),
+                              onPressed: () {
+                                locationFailed = false;
+                                Navigator.pushNamed(context, '/');
+                              },
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  )
-                ],
+                  ],
+                ),
+              )
+            else if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
+              Expanded(
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Expanded(
+                          child: Container(
+                            decoration: BoxDecoration(
+                                color: Colors.black12
+                            ),
+                            child: Center(
+                              child: Text(
+                                "OFFLINE",
+                                style: TextStyle(fontSize: 15),
+                              ),
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    Expanded(
+                      child: Icon(Icons.wifi, size: 100,),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: Column(
+                          //mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            //Text("Location failed"),
+                            RaisedButton(
+                              onPressed: () => AppSettings.openWIFISettings(),
+                              child: Text("Settings"),
+                            ),
+                            RaisedButton(
+                              child: Text("Update"),
+                              onPressed: () {
+                                Navigator.pushNamed(context, '/');
+                              },
+                            ),
+                          ],
+                        ),
+                      ),
+                    )
+                  ],
+                ),
               ) else
             Expanded(
               child: ListView.builder(
