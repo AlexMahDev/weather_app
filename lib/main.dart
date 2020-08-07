@@ -228,7 +228,9 @@ class _TodayState extends State<Today> {
                               child: Text("Update"),
                               onPressed: () {
                                 locationFailed = false;
-                                Navigator.pushNamed(context, '/');
+                                setState(() {
+                                  Splash().createState().getLocation();
+                                });
                               },
                             ),
                           ],
@@ -275,7 +277,10 @@ class _TodayState extends State<Today> {
                             RaisedButton(
                               child: Text("Update"),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/');
+                                setState(() {
+                                  Splash().createState().connection();
+                                  //Splash().createState().getLocation();
+                                });
                               },
                             ),
                           ],
@@ -374,6 +379,46 @@ class Forecast extends StatefulWidget {
 
 class _ForecastState extends State<Forecast> {
 
+  double latitude;
+  double long;
+
+  @override
+  void initState() {
+    super.initState();
+    getLocation();
+  }
+
+
+  void getLocation() async {
+    try {
+      Position position = await Geolocator().getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.low);
+      latitude = position.latitude;
+      long = position.longitude;
+    } catch (exception) {print(exception); locationFailed = true;}
+
+    getData();
+
+  }
+
+
+  void getData() async {
+
+    http.Response response = await http.get('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$long&appid=$apiKey&units=metric');
+
+    if(response.statusCode == 200) {
+      data = jsonDecode(response.body);
+
+      if (mounted) {
+        setState(() {
+          weatherList = data["list"];
+        });
+      }
+
+    } else print(response.statusCode);
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -420,7 +465,9 @@ class _ForecastState extends State<Forecast> {
                               child: Text("Update"),
                               onPressed: () {
                                 locationFailed = false;
-                                Navigator.pushNamed(context, '/');
+                                setState(() {
+                                  Splash().createState().getLocation();
+                                });
                               },
                             ),
                           ],
@@ -467,7 +514,9 @@ class _ForecastState extends State<Forecast> {
                             RaisedButton(
                               child: Text("Update"),
                               onPressed: () {
-                                Navigator.pushNamed(context, '/');
+                                setState(() {
+                                  Splash().createState().getLocation();
+                                });
                               },
                             ),
                           ],
