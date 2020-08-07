@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     FlutterStatusbarcolor.setStatusBarWhiteForeground(false);
     return MaterialApp(
-      theme: ThemeData(brightness: Brightness.light),
+        theme: ThemeData(brightness: Brightness.light),
         initialRoute: '/',
         routes: {
           '/': (context) => Splash(),
@@ -60,7 +60,7 @@ class _SplashState extends State<Splash> {
   double latitude;
   double long;
 
-@override
+  @override
   void initState() {
     super.initState();
     connection();
@@ -72,48 +72,48 @@ class _SplashState extends State<Splash> {
     connectivityResult = await (Connectivity().checkConnectivity());
   }
 
-void getLocation() async {
-  try {
-    Position position = await Geolocator().getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.low);
-    latitude = position.latitude;
-    long = position.longitude;
-  } catch (exception) {print(exception); locationFailed = true;}
+  void getLocation() async {
+    try {
+      Position position = await Geolocator().getCurrentPosition(
+          desiredAccuracy: LocationAccuracy.low);
+      latitude = position.latitude;
+      long = position.longitude;
+    } catch (exception) {print(exception); locationFailed = true;}
 
-  getData();
+    getData();
 
-}
+  }
 
 
-void getData() async {
+  void getData() async {
 
-  http.Response response = await http.get('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$long&appid=$apiKey&units=metric');
+    http.Response response = await http.get('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$long&appid=$apiKey&units=metric');
 
-  if(response.statusCode == 200) {
-    data = jsonDecode(response.body);
+    if(response.statusCode == 200) {
+      data = jsonDecode(response.body);
 
-    image = data["list"][0]["weather"][0]["icon"];
-    cityName = data["city"]["name"];
-    countryName = data["city"]["country"];
-    temperature = data["list"][0]["main"]["temp"].toInt();
-    description = data["list"][0]["weather"][0]["main"];
-    humidityNumber = data["list"][0]["main"]["humidity"];
-    cloudiness = data["list"][0]["clouds"]["all"];
-    pressureNumber = data["list"][0]["main"]["pressure"];
-    windSpeed = (3.6 * data["list"][0]["wind"]["speed"]).toInt();
-    windDir = parsedvalue.windDirection(data["list"][0]["wind"]["deg"]);
+      image = data["list"][0]["weather"][0]["icon"];
+      cityName = data["city"]["name"];
+      countryName = data["city"]["country"];
+      temperature = data["list"][0]["main"]["temp"].toInt();
+      description = data["list"][0]["weather"][0]["main"];
+      humidityNumber = data["list"][0]["main"]["humidity"];
+      cloudiness = data["list"][0]["clouds"]["all"];
+      pressureNumber = data["list"][0]["main"]["pressure"];
+      windSpeed = (3.6 * data["list"][0]["wind"]["speed"]).toInt();
+      windDir = parsedvalue.windDirection(data["list"][0]["wind"]["deg"]);
 
-    if (mounted) {
-      setState(() {
-        weatherList = data["list"];
-      });
-    }
+      if (mounted) {
+        setState(() {
+          weatherList = data["list"];
+        });
+      }
 
-    cityNameChange();
+      cityNameChange();
 
-  } else print(response.statusCode);
+    } else print(response.statusCode);
 
-}
+  }
 
   void cityNameChange() async {
     if((connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile) || locationFailed == true)
@@ -291,7 +291,7 @@ class _TodayState extends State<Today> {
                     Center(
                       child: Column(
                         children: <Widget>[
-                          Image.asset('images/conditions/${weatherCondition.weatherModel(weatherList[0]["dt_txt"].toString().substring(11, 16), weatherList[0]["weather"][0]["main"], weatherList[0]["weather"][0]["description"])}', height: 150, width: 150, fit: BoxFit.cover),
+                          Image.asset('images/conditions/${weatherCondition.weatherModel(data["list"][0]["dt_txt"].toString().substring(11, 16), data["list"][0]["weather"][0]["main"], data["list"][0]["weather"][0]["description"])}', height: 150, width: 150, fit: BoxFit.cover),
                           Text("$cityName, $countryName", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black54)),
                           SizedBox(height: 10,),
                           Text("$temperature°C | $description", style: TextStyle(fontSize: 30, color: Colors.lightBlueAccent),)
@@ -373,6 +373,7 @@ class Forecast extends StatefulWidget {
 }
 
 class _ForecastState extends State<Forecast> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -476,42 +477,42 @@ class _ForecastState extends State<Forecast> {
                   ],
                 ),
               ) else
-            Expanded(
-              child: ListView.builder(
-                  itemCount: weatherList == null ? 0 : weatherList.length,
-                  itemBuilder: (context, index) {
-                    return Column (
-                      children: <Widget>[
-                        if(index == 0)
-                          Row(
-                            children: <Widget>[
-                              Padding(
-                                padding: const EdgeInsets.all(10),
-                                child: Text("Today", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
-                              ),
-                            ],
-                          ),
-                        ListTile(
-                          leading: Image.asset('images/conditions/${weatherCondition.weatherModel(weatherList[index]["dt_txt"].toString().substring(11, 16), weatherList[index]["weather"][0]["main"], weatherList[index]["weather"][0]["description"])}', width: 80, height: 80, fit: BoxFit.cover),
-                          title: Text("${weatherList[index]["dt_txt"].toString().substring(11, 16)}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
-                          subtitle: Text("${weatherList[index]["weather"][0]["description"]}", style: TextStyle(color: Colors.black)),
-                          trailing: Text("${weatherList[index]["main"]["temp"].toInt()}°", style: TextStyle(fontSize: 40, color: Colors.blue)),
-                        ),
-                        if(index != 39)
-                          if(parsedvalue.getDay(DateTime.parse(weatherList[index]["dt_txt"]).weekday) != parsedvalue.getDay(DateTime.parse(weatherList[index+1]["dt_txt"]).weekday) && index + 1 != 40)
+              Expanded(
+                child: ListView.builder(
+                    itemCount: weatherList == null ? 0 : weatherList.length,
+                    itemBuilder: (context, index) {
+                      return Column (
+                        children: <Widget>[
+                          if(index == 0)
                             Row(
                               children: <Widget>[
                                 Padding(
                                   padding: const EdgeInsets.all(10),
-                                  child: Text("${parsedvalue.getDay(1 + DateTime.parse(weatherList[index]["dt_txt"]).weekday)}", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
+                                  child: Text("Today", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
                                 ),
                               ],
                             ),
-                      ],
-                    );
-                  }
+                          ListTile(
+                            leading: Image.asset('images/conditions/${weatherCondition.weatherModel(weatherList[index]["dt_txt"].toString().substring(11, 16), weatherList[index]["weather"][0]["main"], weatherList[index]["weather"][0]["description"])}', width: 80, height: 80, fit: BoxFit.cover),
+                            title: Text("${weatherList[index]["dt_txt"].toString().substring(11, 16)}", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500)),
+                            subtitle: Text("${weatherList[index]["weather"][0]["description"]}", style: TextStyle(color: Colors.black)),
+                            trailing: Text("${weatherList[index]["main"]["temp"].toInt()}°", style: TextStyle(fontSize: 40, color: Colors.blue)),
+                          ),
+                          if(index != 39)
+                            if(parsedvalue.getDay(DateTime.parse(weatherList[index]["dt_txt"]).weekday) != parsedvalue.getDay(DateTime.parse(weatherList[index+1]["dt_txt"]).weekday) && index + 1 != 40)
+                              Row(
+                                children: <Widget>[
+                                  Padding(
+                                    padding: const EdgeInsets.all(10),
+                                    child: Text("${parsedvalue.getDay(1 + DateTime.parse(weatherList[index]["dt_txt"]).weekday)}", style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: Colors.black54)),
+                                  ),
+                                ],
+                              ),
+                        ],
+                      );
+                    }
+                ),
               ),
-            ),
           ],
         )
     );
