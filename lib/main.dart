@@ -6,15 +6,23 @@ import 'dart:convert';
 import 'package:flutter_statusbarcolor/flutter_statusbarcolor.dart';
 import 'package:connectivity/connectivity.dart';
 import 'package:share/share.dart';
+import 'package:weatherapp/screens/todayScreen.dart';
 import 'package:weatherapp/services/values.dart';
 import 'package:splashscreen/splashscreen.dart';
 import 'package:app_settings/app_settings.dart';
 import 'package:weatherapp/services/weatherModel.dart';
+import 'package:weatherapp/screens/locationFailed.dart';
+import 'package:weatherapp/screens/connectionFailed.dart';
+
 
 const apiKey = 'd740d8231f601a1cff9e667cb2205b82';
 
 ParsedValues parsedvalue = ParsedValues();
 WeatherModel weatherCondition = WeatherModel();
+LocationFailed gps = LocationFailed();
+ConnectionFailed internet = ConnectionFailed();
+FirstScreen today = FirstScreen();
+
 
 bool locationFailed;
 
@@ -191,199 +199,13 @@ class _TodayState extends State<Today> {
         ),
         body: Column(
           children: <Widget>[
-            if ((locationFailed == true) && (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile))
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.black12
-                            ),
-                            child: Center(
-                              child: Text(
-                                "Location failed",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    Expanded(
-                      child: Icon(Icons.gps_off, size: 100,),
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: Column(
-                          //mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            RaisedButton(
-                              onPressed: () => AppSettings.openLocationSettings(),
-                              child: Text("Settings"),
-                            ),
-                            RaisedButton(
-                              child: Text("Update"),
-                              onPressed: () {
-                                locationFailed = false;
-                                setState(() {
-                                  Splash().createState().connection();
-                                  Splash().createState().getLocation();
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              )
+            if ((locationFailed == true || temperature == null) && (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile))
+              gps.gpsFailed()
             else if(connectivityResult != ConnectivityResult.wifi && connectivityResult != ConnectivityResult.mobile)
-              Expanded(
-                child: Column(
-                  children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        Expanded(
-                          child: Container(
-                            decoration: BoxDecoration(
-                                color: Colors.black12
-                            ),
-                            child: Center(
-                              child: Text(
-                                "OFFLINE",
-                                style: TextStyle(fontSize: 15),
-                              ),
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    Expanded(
-                      child: Icon(Icons.wifi, size: 100,),
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: Column(
-                          //mainAxisAlignment: MainAxisAlignment.center,
-                          children: <Widget>[
-                            //Text("Location failed"),
-                            RaisedButton(
-                              onPressed: () => AppSettings.openWIFISettings(),
-                              child: Text("Settings"),
-                            ),
-                            RaisedButton(
-                              child: Text("Update"),
-                              onPressed: () {
-                                setState(() {
-                                  Splash().createState().connection();
-                                  Splash().createState().getLocation();
-                                  //temperature = 1;
-                                  //Splash().createState().getLocation();
-                                });
-                              },
-                            ),
-                          ],
-                        ),
-                      ),
-                    )
-                  ],
-                ),
-              ) else if ((temperature == null && locationFailed == false) && (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile))
-                Expanded(
-                  child: GestureDetector(
-                    child: Expanded(
-                      child: Column(
-                        children: <Widget>[
-                          Center(child: Text("Click to Update"))
-                        ],
-                      ),
-                    ),
-                  ),
-                )
-
-            else Expanded(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Center(
-                      child: Column(
-                        children: <Widget>[
-                          Image.asset('images/conditions/${weatherCondition.weatherModel(data["list"][0]["dt_txt"].toString().substring(11, 16), data["list"][0]["weather"][0]["main"], data["list"][0]["weather"][0]["description"])}', height: 150, width: 150, fit: BoxFit.cover),
-                          Text("$cityName, $countryName", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black54)),
-                          SizedBox(height: 10,),
-                          Text("$temperature°C | $description", style: TextStyle(fontSize: 30, color: Colors.lightBlueAccent),)
-                        ],
-                      ),
-                    ),
-                    Column(
-                      children: <Widget>[
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Column(
-                              children: <Widget>[
-                                Image(image: AssetImage('images/water.png'), height: 50, width: 50),
-                                SizedBox(height: 5),
-                                Text("$humidityNumber%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Image(image: AssetImage('images/cloud.png'), height: 50, width: 50),
-                                SizedBox(height: 5),
-                                Text("$cloudiness%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Image(image: AssetImage('images/meter.png'), height: 50, width: 50),
-                                SizedBox(height: 5),
-                                Text("$pressureNumber hPa", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                              ],
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 15),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: <Widget>[
-                            Column(
-                              children: <Widget>[
-                                Image(image: AssetImage('images/wind.png'), height: 50, width: 50),
-                                SizedBox(height: 5),
-                                Text("$windSpeed km/h", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                              ],
-                            ),
-                            Column(
-                              children: <Widget>[
-                                Image(image: AssetImage('images/compass.png'), height: 50, width: 50),
-                                SizedBox(height: 5),
-                                Text("$windDir", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                              ],
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            Share.share("Temperature in $cityName is $temperature°C");
-                          });
-                        },
-                        child: Text("Share", style: TextStyle(fontSize: 20, color: Colors.orangeAccent, fontWeight: FontWeight.bold),),
-                      ),
-                    )
-                  ],
-                ),
-              )
+              internet.internetFailed()
+            else today.todayScreen(),
           ],
-        )
+        ),
     );
   }
 }
@@ -394,46 +216,6 @@ class Forecast extends StatefulWidget {
 }
 
 class _ForecastState extends State<Forecast> {
-
-  double latitude;
-  double long;
-
-  @override
-  void initState() {
-    super.initState();
-    getLocation();
-  }
-
-
-  void getLocation() async {
-    try {
-      Position position = await Geolocator().getCurrentPosition(
-          desiredAccuracy: LocationAccuracy.low);
-      latitude = position.latitude;
-      long = position.longitude;
-    } catch (exception) {print(exception); locationFailed = true;}
-
-    getData();
-
-  }
-
-
-  void getData() async {
-
-    http.Response response = await http.get('https://api.openweathermap.org/data/2.5/forecast?lat=$latitude&lon=$long&appid=$apiKey&units=metric');
-
-    if(response.statusCode == 200) {
-      data = jsonDecode(response.body);
-
-      if (mounted) {
-        setState(() {
-          weatherList = data["list"];
-        });
-      }
-
-    } else print(response.statusCode);
-
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -477,16 +259,6 @@ class _ForecastState extends State<Forecast> {
                               onPressed: () => AppSettings.openLocationSettings(),
                               child: Text("Settings"),
                             ),
-                            RaisedButton(
-                              child: Text("Update"),
-                              onPressed: () {
-                                locationFailed = false;
-                                setState(() {
-                                  Splash().createState().connection();
-                                  Splash().createState().getLocation();
-                                });
-                              },
-                            ),
                           ],
                         ),
                       ),
@@ -527,15 +299,6 @@ class _ForecastState extends State<Forecast> {
                             RaisedButton(
                               onPressed: () => AppSettings.openWIFISettings(),
                               child: Text("Settings"),
-                            ),
-                            RaisedButton(
-                              child: Text("Update"),
-                              onPressed: () {
-                                setState(() {
-                                  Splash().createState().connection();
-                                  Splash().createState().getLocation();
-                                });
-                              },
                             ),
                           ],
                         ),
