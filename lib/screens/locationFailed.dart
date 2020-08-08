@@ -26,7 +26,14 @@ class LocationFailed {
             ],
           ),
           Expanded(
-            child: Icon(Icons.gps_off, size: 100,),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.gps_off, size: 100),
+                SizedBox(height: 15),
+                Text("Turn on GPS and restart the application", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
+              ],
+            ),
           ),
           Expanded(
             child: Center(

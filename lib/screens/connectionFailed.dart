@@ -26,7 +26,14 @@ class ConnectionFailed {
               ],
             ),
             Expanded(
-              child: Icon(Icons.wifi, size: 100,),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.wifi, size: 100),
+                  SizedBox(height: 15),
+                  Text("Turn on Internet and restart the application", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
+                ],
+              ),
             ),
             Expanded(
               child: Center(

@@ -9,8 +9,6 @@ PODS:
   - connectivity_macos (0.0.1):
     - Flutter
   - Flutter (1.0.0)
-  - flutter_statusbarcolor (0.0.1):
-    - Flutter
   - "geolocator (5.3.2+2)":
     - Flutter
   - google_api_availability (2.0.4):
@@ -27,7 +25,6 @@ DEPENDENCIES:
   - connectivity_for_web (from `.symlinks/plugins/connectivity_for_web/ios`)
   - connectivity_macos (from `.symlinks/plugins/connectivity_macos/ios`)
   - Flutter (from `Flutter`)
-  - flutter_statusbarcolor (from `.symlinks/plugins/flutter_statusbarcolor/ios`)
   - geolocator (from `.symlinks/plugins/geolocator/ios`)
   - google_api_availability (from `.symlinks/plugins/google_api_availability/ios`)
   - location_permissions (from `.symlinks/plugins/location_permissions/ios`)
@@ -48,8 +45,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/connectivity_macos/ios"
   Flutter:
     :path: Flutter
-  flutter_statusbarcolor:
-    :path: ".symlinks/plugins/flutter_statusbarcolor/ios"
   geolocator:
     :path: ".symlinks/plugins/geolocator/ios"
   google_api_availability:
@@ -65,7 +60,6 @@ SPEC CHECKSUMS:
   connectivity_for_web: 2b8584556930d4bd490d82b836bcf45067ce345b
   connectivity_macos: e2e9731b6b22dda39eb1b128f6969d574460e191
   Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
-  flutter_statusbarcolor: 8afb1071ed8c58be929f1e32b36c629771fd2259
   geolocator: f7622e0e7e2a24718285b73916d60c4a54b9f5b6
   google_api_availability: 15fa42a8cd83c0a6738507ffe6e87096f12abcb8
   location_permissions: 7e0f9aa0f60deb8ff93ddf0e2a164c7e8197bc94

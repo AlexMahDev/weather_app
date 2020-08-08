@@ -69,18 +69,18 @@ class FirstScreen {
                   ),
                 ],
               ),
-              Center(
-                child: GestureDetector(
-                  onTap: () {
-                    //setState(() {
-                      Share.share("Temperature in $cityName is $temperature°C");
-                    //});
-                  },
-                  child: Text("Share", style: TextStyle(fontSize: 20, color: Colors.orangeAccent, fontWeight: FontWeight.bold),),
-                ),
-              )
             ],
           ),
+          Center(
+            child: GestureDetector(
+              onTap: () {
+                //setState(() {
+                Share.share("Temperature in $cityName is $temperature°C");
+                //});
+              },
+              child: Text("Share", style: TextStyle(fontSize: 20, color: Colors.orangeAccent, fontWeight: FontWeight.bold),),
+            ),
+          )
         ],
       ),
     );
