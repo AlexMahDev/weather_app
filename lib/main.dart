@@ -191,7 +191,7 @@ class _TodayState extends State<Today> {
         ),
         body: Column(
           children: <Widget>[
-            if ((locationFailed == true || temperature == null) && (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile))
+            if ((locationFailed == true) && (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile))
               Expanded(
                 child: Column(
                   children: <Widget>[
@@ -229,6 +229,7 @@ class _TodayState extends State<Today> {
                               onPressed: () {
                                 locationFailed = false;
                                 setState(() {
+                                  Splash().createState().connection();
                                   Splash().createState().getLocation();
                                 });
                               },
@@ -279,6 +280,8 @@ class _TodayState extends State<Today> {
                               onPressed: () {
                                 setState(() {
                                   Splash().createState().connection();
+                                  Splash().createState().getLocation();
+                                  //temperature = 1;
                                   //Splash().createState().getLocation();
                                 });
                               },
@@ -289,7 +292,20 @@ class _TodayState extends State<Today> {
                     )
                   ],
                 ),
-              ) else Expanded(
+              ) else if ((temperature == null && locationFailed == false) && (connectivityResult == ConnectivityResult.wifi || connectivityResult == ConnectivityResult.mobile))
+                Expanded(
+                  child: GestureDetector(
+                    child: Expanded(
+                      child: Column(
+                        children: <Widget>[
+                          Center(child: Text("Click to Update"))
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+
+            else Expanded(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -466,6 +482,7 @@ class _ForecastState extends State<Forecast> {
                               onPressed: () {
                                 locationFailed = false;
                                 setState(() {
+                                  Splash().createState().connection();
                                   Splash().createState().getLocation();
                                 });
                               },
@@ -515,6 +532,7 @@ class _ForecastState extends State<Forecast> {
                               child: Text("Update"),
                               onPressed: () {
                                 setState(() {
+                                  Splash().createState().connection();
                                   Splash().createState().getLocation();
                                 });
                               },
