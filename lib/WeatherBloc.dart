@@ -38,8 +38,6 @@ class WeatherIsLoaded extends WeatherState{
 
   WeatherIsLoaded(this._weather);
 
-  //WeatherModel get getWeather => _weather;
-
   @override
   // TODO: implement props
   List<Object> get props => [_weather];
@@ -63,8 +61,6 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState>{
   Stream<WeatherState> mapEventToState(WeatherEvent event) async*{
     // TODO: implement mapEventToState
     if(event is FetchWeather){
-      //yield WeatherIsLoading();
-
       try{
         final weather = await weatherRepo.getWeather();
         yield WeatherIsLoaded(weather);
