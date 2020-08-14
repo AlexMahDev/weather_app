@@ -196,7 +196,7 @@ class Today extends StatelessWidget {
 }
 
 class Forecast extends StatelessWidget {
-  //xxx
+  //xxxx
   @override
   Widget build(BuildContext context) {
     final weatherBloc = BlocProvider.of<WeatherBloc>(context);
