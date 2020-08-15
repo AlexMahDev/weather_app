@@ -2,6 +2,8 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:weatherapp/WeatherRepo.dart';
 
+var weather;
+
 class WeatherEvent extends Equatable{
   @override
   // TODO: implement props
@@ -14,6 +16,10 @@ class FetchWeather extends WeatherEvent{
 }
 
 class ResetWeather extends WeatherEvent{
+
+}
+
+class ShowWeather extends WeatherEvent{
 
 }
 
@@ -62,7 +68,7 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState>{
     // TODO: implement mapEventToState
     if(event is FetchWeather){
       try{
-        final weather = await weatherRepo.getWeather();
+        weather = await weatherRepo.getWeather();
         yield WeatherIsLoaded(weather);
       }catch(_){
         print(_);
@@ -70,6 +76,8 @@ class WeatherBloc extends Bloc<WeatherEvent, WeatherState>{
       }
     }else if(event is ResetWeather){
       yield SecondScreen();
+    }else if (event is ShowWeather) {
+      yield WeatherIsLoaded(weather);
     }
   }
 

@@ -206,7 +206,7 @@ class Forecast extends StatelessWidget {
           leading: FlatButton(
             child: Icon(Icons.keyboard_backspace, color: Colors.black),
             onPressed: () {
-              weatherBloc.add(FetchWeather());
+              weatherBloc.add(ShowWeather());
             },
           ),
         ),
