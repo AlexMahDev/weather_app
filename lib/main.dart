@@ -88,11 +88,18 @@ class SearchPage extends StatelessWidget {
   }
 }
 
-class Today extends StatelessWidget {
+class Today extends StatefulWidget {
 
+  @override
+  _TodayState createState() => _TodayState();
+}
+
+class _TodayState extends State<Today> {
   Future<Null> _handleRefresh() async {
     await WeatherRepo().getWeather();
-
+    setState(() {
+      WeatherRepo().getWeather();
+    });
     return null;
   }
 

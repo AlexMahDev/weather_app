@@ -11,18 +11,21 @@ List weatherList;
 var city;
 var country;
 
-double latitude;
-double long;
-
 class WeatherRepo{
+
+  var _latitude;
+  var _long;
 
   Future getWeather() async {
 
     Position position = await Geolocator().getCurrentPosition(
         desiredAccuracy: LocationAccuracy.medium);
 
+    _latitude = position.latitude;
+    _long = position.longitude;
+
     http.Response response = await http.get(
-        'https://api.openweathermap.org/data/2.5/forecast?lat=${position.latitude}&lon=${position.longitude}&appid=$apiKey&units=metric');
+        'https://api.openweathermap.org/data/2.5/forecast?lat=$_latitude&lon=$_long&appid=$apiKey&units=metric');
 
     if (response.statusCode == 200) {
       data = jsonDecode(response.body);
