@@ -16,7 +16,6 @@ double long;
 
 class WeatherRepo{
 
-
   Future getWeather() async {
 
     Position position = await Geolocator().getCurrentPosition(

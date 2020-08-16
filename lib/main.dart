@@ -44,7 +44,7 @@ class SearchPage extends StatelessWidget {
         if (state is WeatherIsLoading)
           return Container(
             decoration: BoxDecoration(
-              color: Colors.lightBlue
+                color: Colors.lightBlue
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -74,10 +74,10 @@ class SearchPage extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               GestureDetector(
-                  child: Icon(Icons.refresh, size: 200),
-                  onTap: () {
-                    weatherBloc.add(FetchWeather());
-                  },
+                child: Icon(Icons.refresh, size: 200),
+                onTap: () {
+                  weatherBloc.add(FetchWeather());
+                },
               ),
               Center(child: Text("Check Internet connection and GPS", style: TextStyle(color: Colors.white30))),
               Center(child: Text('Click "Refresh"', style: TextStyle(color: Colors.white30)))
@@ -89,6 +89,13 @@ class SearchPage extends StatelessWidget {
 }
 
 class Today extends StatelessWidget {
+
+  Future<Null> _handleRefresh() async {
+    await WeatherRepo().getWeather();
+
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     final weatherBloc = BlocProvider.of<WeatherBloc>(context);
@@ -103,93 +110,97 @@ class Today extends StatelessWidget {
               }
           ),
         ),
-        body: Column(
-          children: <Widget>[
-            Expanded(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Center(
-                    child: Column(
-                      children: <Widget>[
-                        Image.asset('images/conditions/${weatherCondition.weatherModel(data["list"][0]["dt_txt"].toString().substring(11, 16), data["list"][0]["weather"][0]["main"], data["list"][0]["weather"][0]["description"])}', height: 150, width: 150, fit: BoxFit.cover),
-                        Text("$city, $country", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black54)),
-                        SizedBox(
-                          height: 10,
-                        ),
-                        Text("${weatherList[0]["main"]["temp"].toInt()}°C | ${weatherList[0]["weather"][0]["main"]}", style: TextStyle(fontSize: 30, color: Colors.lightBlueAccent),)
+        body: RefreshIndicator(
+          onRefresh: _handleRefresh,
+          child: CustomScrollView(
+            slivers: [
+              SliverFillRemaining(
+                hasScrollBody: false,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    Center(
+                      child: Column(
+                        children: <Widget>[
+                          Image.asset('images/conditions/${weatherCondition.weatherModel(data["list"][0]["dt_txt"].toString().substring(11, 16), data["list"][0]["weather"][0]["main"], data["list"][0]["weather"][0]["description"])}', height: 150, width: 150, fit: BoxFit.cover),
+                          Text("$city, $country", style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: Colors.black54)),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text("${weatherList[0]["main"]["temp"].toInt()}°C | ${weatherList[0]["weather"][0]["main"]}", style: TextStyle(fontSize: 30, color: Colors.lightBlueAccent),)
 
+                        ],
+                      ),
+                    ),
+                    Column(
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Column(
+                              children: <Widget>[
+                                Image(image: AssetImage('images/water.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("${weatherList[0]["main"]["humidity"]}%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Image(image: AssetImage('images/cloud.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("${weatherList[0]["clouds"]["all"]}%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Image(image: AssetImage('images/meter.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("${weatherList[0]["main"]["pressure"]} hPa", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
+                              ],
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 15),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            Column(
+                              children: <Widget>[
+                                Image(image: AssetImage('images/wind.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("${(3.6 * weatherList[0]["wind"]["speed"]).toInt()} km/h", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
+                              ],
+                            ),
+                            Column(
+                              children: <Widget>[
+                                Image(image: AssetImage('images/compass.png'), height: 50, width: 50),
+                                SizedBox(height: 5),
+                                Text("${parsedvalue.windDirection(weatherList[0]["wind"]["deg"])}", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
+                              ],
+                            ),
+                          ],
+                        ),
                       ],
                     ),
-                  ),
-                  Column(
-                    children: <Widget>[
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Column(
-                            children: <Widget>[
-                              Image(image: AssetImage('images/water.png'), height: 50, width: 50),
-                              SizedBox(height: 5),
-                              Text("${weatherList[0]["main"]["humidity"]}%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Image(image: AssetImage('images/cloud.png'), height: 50, width: 50),
-                              SizedBox(height: 5),
-                              Text("${weatherList[0]["clouds"]["all"]}%", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Image(image: AssetImage('images/meter.png'), height: 50, width: 50),
-                              SizedBox(height: 5),
-                              Text("${weatherList[0]["main"]["pressure"]} hPa", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                            ],
-                          ),
-                        ],
+                    Center(
+                      child: GestureDetector(
+                        onTap: () {
+                          Share.share("Temperature in $city is ${weatherList[0]["main"]["temp"].toInt()}°C");
+                        },
+                        child: Text(
+                          "Share",
+                          style: TextStyle(
+                              fontSize: 20,
+                              color: Colors.orangeAccent,
+                              fontWeight: FontWeight.bold),
+                        ),
                       ),
-                      SizedBox(height: 15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: <Widget>[
-                          Column(
-                            children: <Widget>[
-                              Image(image: AssetImage('images/wind.png'), height: 50, width: 50),
-                              SizedBox(height: 5),
-                              Text("${(3.6 * weatherList[0]["wind"]["speed"]).toInt()} km/h", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                            ],
-                          ),
-                          Column(
-                            children: <Widget>[
-                              Image(image: AssetImage('images/compass.png'), height: 50, width: 50),
-                              SizedBox(height: 5),
-                              Text("${parsedvalue.windDirection(weatherList[0]["wind"]["deg"])}", style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15, color: Colors.black54))
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  Center(
-                    child: GestureDetector(
-                      onTap: () {
-                        Share.share("Temperature in $city is ${weatherList[0]["main"]["temp"].toInt()}°C");
-                      },
-                      child: Text(
-                        "Share",
-                        style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.orangeAccent,
-                            fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  )
-                ],
+                    )
+                  ],
+                )
               ),
-            )
-          ],
+            ],
+          ),
         )
     );
   }
