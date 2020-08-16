@@ -14,18 +14,21 @@ var country;
 class WeatherRepo{
 
   var _latitude;
-  var _long;
+  var _longitude;
 
   Future getWeather() async {
 
+    try {
     Position position = await Geolocator().getCurrentPosition(
         desiredAccuracy: LocationAccuracy.medium);
-
     _latitude = position.latitude;
-    _long = position.longitude;
+    _longitude = position.longitude;
+    } catch (_) {
+      print(_);
+    }
 
     http.Response response = await http.get(
-        'https://api.openweathermap.org/data/2.5/forecast?lat=$_latitude&lon=$_long&appid=$apiKey&units=metric');
+        'https://api.openweathermap.org/data/2.5/forecast?lat=$_latitude&lon=$_longitude&appid=$apiKey&units=metric');
 
     if (response.statusCode == 200) {
       data = jsonDecode(response.body);

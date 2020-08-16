@@ -98,7 +98,7 @@ class _TodayState extends State<Today> {
   Future<Null> _handleRefresh() async {
     await WeatherRepo().getWeather();
     setState(() {
-      WeatherRepo().getWeather();
+      WeatherIsLoaded(weather);
     });
     return null;
   }
